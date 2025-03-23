@@ -1,4 +1,4 @@
-package com.barbichetz.security;
+package main.java.com.barbichetz.security;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
