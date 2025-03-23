@@ -9,5 +9,5 @@ module Missié_Moustass_V1 {
     
     exports com.barbichetz.voice;
     exports com.barbichetz.security;
-    exports com.barbichetz.storage;
+   // exports com.barbichetz.storage;
 }
