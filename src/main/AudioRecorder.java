@@ -228,6 +228,8 @@ public class AudioRecorder extends JFrame {
             }
         });
         
+        //button arret
+        
         btnStop = new JButton("Arrêter");
         btnStop.setEnabled(false);
         btnStop.addActionListener(new ActionListener() {
@@ -254,6 +256,8 @@ public class AudioRecorder extends JFrame {
                 }
             }
         });
+        
+        //buttou supprimer
         
         btnDelete = new JButton("Supprimer");
         btnDelete.setBackground(new Color(255, 165, 0));
