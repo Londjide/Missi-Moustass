@@ -1,4 +1,4 @@
-package main;
+package Auth;
 
 import java.awt.EventQueue;
 import javax.swing.*;
@@ -53,6 +53,10 @@ public class AudioRecorder extends JFrame {
     private JButton btnDelete;
     /** Étiquette affichant l'état actuel de l'application */
     private JLabel statusLabel;
+    /** Identifiant de l'utilisateur connecté */
+    private int userId;
+    /** Étiquette affichant le nom de l'utilisateur connecté */
+    private JLabel userLabel;
     
     /** Connexion à la base de données SQLite */
     private Connection conn;
@@ -76,9 +80,7 @@ public class AudioRecorder extends JFrame {
     private Mixer.Info selectedMixer = null;
 
     /**
-     * Point d'entrée principal de l'application.
-     * Configure les propriétés système pour améliorer la compatibilité audio sur macOS
-     * et lance l'interface graphique.
+     * Point d'entrée principal de l'application lorsqu'elle est lancée directement.
      * 
      * @param args Arguments de ligne de commande (non utilisés)
      */
@@ -90,8 +92,13 @@ public class AudioRecorder extends JFrame {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    AudioRecorder frame = new AudioRecorder();
-                    frame.setVisible(true);
+                    // Si lancé directement, demander à l'utilisateur de se connecter
+                    JOptionPane.showMessageDialog(null, 
+                            "Veuillez vous connecter d'abord.", 
+                            "Connexion requise", 
+                            JOptionPane.INFORMATION_MESSAGE);
+                    Connexion connexion = new Connexion();
+                    connexion.afficher();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -101,28 +108,21 @@ public class AudioRecorder extends JFrame {
 
     /**
      * Constructeur de la classe AudioRecorder.
-     * Initialise la base de données, l'interface utilisateur et charge les enregistrements existants.
+     * Initialise la base de données, l'interface utilisateur et charge les enregistrements existants
+     * pour l'utilisateur spécifié.
+     * 
+     * @param userId Identifiant de l'utilisateur connecté
      */
-    public AudioRecorder() {
+    public AudioRecorder(int userId) {
+        this.userId = userId;
         initializeDatabase();
         initializeUI();
+        loadUserInfo();
         loadAudioRecordings();
-        
-        // Vérification des permissions du microphone au démarrage
     }
     
     /**
-     * Initialise la connexion à la base de données SQLite et crée la table des enregistrements
-     * si elle n'existe pas déjà.
-     * 
-     * La table contient les colonnes suivantes :
-     * - id : Identifiant unique auto-incrémenté
-     * - name : Nom de l'enregistrement
-     * - timestamp : Date et heure de l'enregistrement
-     * - duration : Durée en secondes
-     * - audio : Données audio chiffrées (BLOB)
-     * - encryption_key : Clé de chiffrement en Base64
-     * - audio_hash : Hash SHA-256 pour vérifier l'intégrité
+     * Initialise la connexion à la base de données SQLite.
      */
     private void initializeDatabase() {
         try {
@@ -130,26 +130,34 @@ public class AudioRecorder extends JFrame {
             Class.forName("org.sqlite.JDBC");
             
             // Création d'une connexion à la base de données
-            conn = DriverManager.getConnection("jdbc:sqlite:mac1.db"); // macaudiorecordings
+            conn = DriverManager.getConnection("jdbc:sqlite:users.db");
 
-            // Création de la table des enregistrements si elle n'existe pas déjà
-            Statement stmt = conn.createStatement();
-            String sql = "CREATE TABLE IF NOT EXISTS recordings " +
-                         "(id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                         " name TEXT NOT NULL, " +
-                         " timestamp TEXT NOT NULL, " +
-                         " duration INTEGER, " +
-                         " audio BLOB NOT NULL, " +
-                         " encryption_key TEXT NOT NULL, " +
-                         " audio_hash TEXT NOT NULL)"; // Ajout de la colonne audio_hash
-            stmt.executeUpdate(sql);
-            stmt.close();
-            
             System.out.println("Base de données initialisée avec succès");
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, "Échec de l'initialisation de la base de données: " + e.getMessage(), 
                                          "Erreur de base de données", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    /**
+     * Charge les informations de l'utilisateur connecté.
+     */
+    private void loadUserInfo() {
+        try {
+            PreparedStatement pstmt = conn.prepareStatement("SELECT email FROM users WHERE id = ?");
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            if (rs.next()) {
+                String email = rs.getString("email");
+                userLabel.setText("Utilisateur connecté: " + email);
+            }
+            
+            rs.close();
+            pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
     
@@ -160,18 +168,38 @@ public class AudioRecorder extends JFrame {
     private void initializeUI() {
         setTitle("Enregistreur Audio");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 650, 450);
+        setBounds(100, 100, 650, 500);
         
         contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(10, 10, 10, 10));
         contentPane.setLayout(new BorderLayout(10, 10));
         setContentPane(contentPane);
         
+        // Panel pour le titre et l'utilisateur
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        
         // Étiquette de titre
         JLabel titleLabel = new JLabel("");
         titleLabel.setFont(new Font("Helvetica Neue", Font.BOLD, 18));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        contentPane.add(titleLabel, BorderLayout.NORTH);
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+        
+        // Étiquette utilisateur
+        userLabel = new JLabel("Utilisateur connecté: ");
+        headerPanel.add(userLabel, BorderLayout.SOUTH);
+        
+        // Bouton de déconnexion
+        JButton logoutButton = new JButton("Déconnexion");
+        logoutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dispose();
+                Connexion connexion = new Connexion();
+                connexion.afficher();
+            }
+        });
+        headerPanel.add(logoutButton, BorderLayout.EAST);
+        
+        contentPane.add(headerPanel, BorderLayout.NORTH);
         
         // Panneau du tableau
         JPanel tablePanel = new JPanel(new BorderLayout());
@@ -227,7 +255,6 @@ public class AudioRecorder extends JFrame {
                 }
             }
         });
-        
         btnStop = new JButton("Arrêter");
         btnStop.setEnabled(false);
         btnStop.addActionListener(new ActionListener() {
@@ -290,11 +317,18 @@ public class AudioRecorder extends JFrame {
         try {
             // Effacement du tableau
             tableModel.setRowCount(0);
+            
+            
+            
 
             // Interrogation de la base de données pour tous les enregistrements
-            Statement stmt = conn.createStatement();
-            String sql = "SELECT id, name, timestamp, duration, audio, encryption_key, audio_hash FROM recordings ORDER BY timestamp DESC";
-            ResultSet rs = stmt.executeQuery(sql);
+            PreparedStatement pstmt = conn.prepareStatement(
+                    "SELECT id, name, timestamp, duration, audio, encryption_key, audio_hash " +
+                    "FROM recordings WHERE user_id = ? ORDER BY timestamp DESC");
+            String sql = "SELECT id, name, timestamp, duration, audio, encryption_key, audio_hash FROM recordings WHERE user_id = ? ORDER BY timestamp DESC";
+            pstmt.setInt(1, userId); // Use the userId from the current instance
+            ResultSet rs = pstmt.executeQuery();
+            
 
             // Ajout de chaque enregistrement au tableau
             while (rs.next()) {
@@ -330,7 +364,7 @@ public class AudioRecorder extends JFrame {
             }
 
             rs.close();
-            stmt.close();
+            pstmt.close();
         } catch (Exception e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(this, "Échec du chargement des enregistrements: " + e.getMessage(),
@@ -488,7 +522,7 @@ public class AudioRecorder extends JFrame {
             String audioHash = computeSHA256Hash(audioData);
 
             // Sauvegarde des données audio chiffrées, de la clé de chiffrement et du hash dans la base de données
-            String sql = "INSERT INTO recordings (name, timestamp, duration, audio, encryption_key, audio_hash) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO recordings (name, timestamp, duration, audio, encryption_key, audio_hash, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, name);
             pstmt.setString(2, timestamp);
@@ -496,6 +530,7 @@ public class AudioRecorder extends JFrame {
             pstmt.setBytes(4, encryptedAudioData);
             pstmt.setString(5, AES.encodeKeyToBase64(secretKey)); // Stockage de la clé de chiffrement en tant que chaîne Base64
             pstmt.setString(6, audioHash); // Stockage du hash
+          pstmt.setInt(7, userId);  // Ensure you pass the correct logged-in user's ID
             pstmt.executeUpdate();
             pstmt.close();
             
