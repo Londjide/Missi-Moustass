@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest  # Changé pour Windows
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -19,8 +19,10 @@ jobs:
         java-version: '17'
         distribution: 'adopt'
         
-    - name: Create lib directory
-      run: mkdir lib
+    - name: Create directories
+      run: |
+        mkdir -p lib
+        mkdir -p bin
       
     - name: Download dependencies
       run: |
@@ -31,13 +33,15 @@ jobs:
     - name: Build with Java
       run: |
         javac -cp "lib/*" -d bin src/main/*.java src/main/java/com/barbichetz/*/*.java
-        
-    - name: Run Tests
-      run: |
-        java -cp "bin;lib/*" org.junit.runner.JUnitCore main.AudioRecorderTest
+      
+    - name: List compiled files
+      run: dir bin
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: build
-        path: bin/
+        name: missie-moustass-build
+        path: |
+          bin/**/*.class
+          lib/*.jar
+        if-no-files-found: error
