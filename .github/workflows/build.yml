@@ -6,13 +6,13 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
-  sonarqube:
-    name: SonarQube
-    runs-on: windows-latest
+  sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -21,34 +21,21 @@ jobs:
           distribution: 'temurin'
 
       - name: Create directories
-        shell: cmd
         run: |
-          if not exist lib mkdir lib
-          if not exist bin mkdir bin
+          mkdir -p lib
+          mkdir -p bin
 
       - name: Download dependencies
-        shell: cmd
         run: |
-          curl -L -o "lib\sqlite-jdbc-3.49.1.0.jar" "https://github.com/xerial/sqlite-jdbc/releases/download/3.49.1.0/sqlite-jdbc-3.49.1.0.jar"
+          curl -L -o "lib/sqlite-jdbc-3.49.1.0.jar" "https://github.com/xerial/sqlite-jdbc/releases/download/3.49.1.0/sqlite-jdbc-3.49.1.0.jar"
 
       - name: Compile Java files
-        shell: cmd
         run: |
-          dir /S /B src\*.java > sources.txt
-          javac -cp "lib\*" -d bin @sources.txt
-          dir bin
+          find src -name "*.java" > sources.txt
+          javac -cp "lib/*" -d bin @sources.txt
 
-      - name: Add bin to Git
-        shell: cmd
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add bin/
-          git commit -m "add: compiled files for sonarcloud"
-          git push
-
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v5
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
