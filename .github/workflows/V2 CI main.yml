@@ -19,7 +19,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: 'maven'
+        # Suppression de la ligne cache: 'maven' qui causait l'erreur
 
     - name: Create directories
       shell: cmd
@@ -34,19 +34,31 @@ jobs:
         curl -L -o "lib\junit-4.13.2.jar" "https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar"
         curl -L -o "lib\hamcrest-core-1.3.jar" "https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar"
 
+    - name: List project structure
+      shell: cmd
+      run: |
+        echo "Project structure:"
+        dir /s /b
+        echo "Content of src directory:"
+        dir src /s /b
+
     - name: Build project
       shell: cmd
       run: |
-        dir
-        javac -cp "lib\*" -d bin src\main\*.java src\main\java\com\barbichetz\*\*.java
+        echo "Building project..."
+        javac -cp "lib\*" -d bin src\main\*.java
+        if errorlevel 1 (
+          echo "Build failed"
+          exit /b 1
+        )
 
-    - name: List files
+    - name: List compiled files
       shell: cmd
       run: |
         echo "Content of bin directory:"
-        dir bin
+        dir bin /s /b
         echo "Content of lib directory:"
-        dir lib
+        dir lib /s /b
 
     - name: Create artifact
       shell: cmd
@@ -58,3 +70,4 @@ jobs:
       with:
         name: MissieMoustass
         path: MissieMoustass.jar
+        if-no-files-found: error
