@@ -11,37 +11,50 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v3
-    
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'adopt'
-        
+        distribution: 'temurin'
+        cache: 'maven'
+
     - name: Create directories
+      shell: cmd
       run: |
-        mkdir -p lib
-        mkdir -p bin
-      
+        if not exist lib mkdir lib
+        if not exist bin mkdir bin
+
     - name: Download dependencies
+      shell: cmd
       run: |
-        curl -L -o lib/sqlite-jdbc-3.49.1.0.jar https://github.com/xerial/sqlite-jdbc/releases/download/3.49.1.0/sqlite-jdbc-3.49.1.0.jar
-        curl -L -o lib/junit-4.13.2.jar https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar
-        curl -L -o lib/hamcrest-core-1.3.jar https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar
-        
-    - name: Build with Java
+        curl -L -o "lib\sqlite-jdbc-3.49.1.0.jar" "https://github.com/xerial/sqlite-jdbc/releases/download/3.49.1.0/sqlite-jdbc-3.49.1.0.jar"
+        curl -L -o "lib\junit-4.13.2.jar" "https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar"
+        curl -L -o "lib\hamcrest-core-1.3.jar" "https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar"
+
+    - name: Build project
+      shell: cmd
       run: |
-        javac -cp "lib/*" -d bin src/main/*.java src/main/java/com/barbichetz/*/*.java
-      
-    - name: List compiled files
-      run: dir bin
-        
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+        dir
+        javac -cp "lib\*" -d bin src\main\*.java src\main\java\com\barbichetz\*\*.java
+
+    - name: List files
+      shell: cmd
+      run: |
+        echo "Content of bin directory:"
+        dir bin
+        echo "Content of lib directory:"
+        dir lib
+
+    - name: Create artifact
+      shell: cmd
+      run: |
+        jar cvf MissieMoustass.jar -C bin .
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
       with:
-        name: missie-moustass-build
-        path: |
-          bin/**/*.class
-          lib/*.jar
-        if-no-files-found: error
+        name: MissieMoustass
+        path: MissieMoustass.jar
