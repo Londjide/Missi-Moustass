@@ -19,7 +19,16 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        # Suppression de la ligne cache: 'maven' qui causait l'erreur
+
+    - name: Show project structure
+      shell: cmd
+      run: |
+        echo "=== Current Directory ==="
+        cd
+        echo "=== Project Structure ==="
+        tree /F
+        echo "=== Source Files ==="
+        dir /S /B *.java
 
     - name: Create directories
       shell: cmd
@@ -34,38 +43,46 @@ jobs:
         curl -L -o "lib\junit-4.13.2.jar" "https://repo1.maven.org/maven2/junit/junit/4.13.2/junit-4.13.2.jar"
         curl -L -o "lib\hamcrest-core-1.3.jar" "https://repo1.maven.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar"
 
-    - name: List project structure
+    - name: Verify Java installation
       shell: cmd
       run: |
-        echo "Project structure:"
-        dir /s /b
-        echo "Content of src directory:"
-        dir src /s /b
+        java -version
+        javac -version
+        echo "JAVA_HOME=%JAVA_HOME%"
 
-    - name: Build project
+    - name: Compile project
       shell: cmd
       run: |
-        echo "Building project..."
-        javac -cp "lib\*" -d bin src\main\*.java
-        if errorlevel 1 (
-          echo "Build failed"
+        echo "=== Compiling Java Files ==="
+        dir /S /B *.java > sources.txt
+        javac -verbose -cp "lib\*" -d bin @sources.txt
+        if %errorlevel% neq 0 (
+          echo "Compilation failed"
           exit /b 1
         )
 
-    - name: List compiled files
+    - name: Verify compilation
       shell: cmd
       run: |
-        echo "Content of bin directory:"
-        dir bin /s /b
-        echo "Content of lib directory:"
-        dir lib /s /b
+        echo "=== Compiled Files ==="
+        dir /S /B bin\*.class
+        if %errorlevel% neq 0 (
+          echo "No class files found"
+          exit /b 1
+        )
 
-    - name: Create artifact
+    - name: Create JAR
       shell: cmd
       run: |
+        echo "=== Creating JAR ==="
         jar cvf MissieMoustass.jar -C bin .
+        if %errorlevel% neq 0 (
+          echo "JAR creation failed"
+          exit /b 1
+        )
 
     - name: Upload artifact
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: MissieMoustass
