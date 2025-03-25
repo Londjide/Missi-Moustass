@@ -1,7 +1,7 @@
 # Fichiers compilés
 
-/bin/
-*.class
+# /bin
+# *.class
 
 # Fichiers Eclipse
 .settings/
@@ -28,3 +28,4 @@ recordings/
 hs_err_pid*
 replay_pid* 
 
+/bin/
