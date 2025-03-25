@@ -114,8 +114,8 @@ public class AudioRecorder extends JFrame {
      * @param userId Identifiant de l'utilisateur connecté
      */
     public AudioRecorder(int userId) {
+    	this.audioFormat = new AudioFormat(44100, 8, 1, true, true);
         this.userId = userId;
-        this.audioFormat = new AudioFormat(44100, 16, 1, true, true) ;
         initializeDatabase();
         initializeUI();
         loadUserInfo();
@@ -382,7 +382,7 @@ public class AudioRecorder extends JFrame {
         try {
             // Configuration du format audio - optimisé pour la compatibilité macOS
             // Utilisation de stéréo (2 canaux) et big-endian (true) pour une meilleure compatibilité Mac
-            audioFormat = new AudioFormat(44100, 16, 1, true, true);
+            audioFormat = new AudioFormat(44100, 8, 1, true, true);
             DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
             
             // Vérification si le système prend en charge le format audio
@@ -513,15 +513,11 @@ public class AudioRecorder extends JFrame {
      */
     private void saveRecordingToDatabase(String name, String timestamp, int duration, byte[] audioData) {
         try {
-        	
-        	
-        	
             // Génération d'une clé secrète AES
             SecretKey secretKey = AES.generateSecretKey();
 
             // Chiffrement des données audio
             byte[] encryptedAudioData = AES.encrypt(audioData, secretKey);
-            
 
             // Calcul du hash SHA-256 des données audio
             String audioHash = computeSHA256Hash(audioData);
