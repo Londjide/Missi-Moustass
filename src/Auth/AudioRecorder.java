@@ -282,8 +282,6 @@ public class AudioRecorder extends JFrame {
             }
         });
         
-        //buttou supprimer
-        
         btnDelete = new JButton("Supprimer");
         btnDelete.setBackground(new Color(255, 165, 0));
         btnDelete.setEnabled(false);

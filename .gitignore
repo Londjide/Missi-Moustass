@@ -28,3 +28,4 @@ recordings/
 hs_err_pid*
 replay_pid* 
 
+/bin/
