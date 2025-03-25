@@ -115,11 +115,7 @@ public class AudioRecorder extends JFrame {
      */
     public AudioRecorder(int userId) {
         this.userId = userId;
-<<<<<<< HEAD
-        this.audioFormat = new AudioFormat(44100, 16, 1, true, false) ;
-=======
-        this.audioFormat = new AudioFormat(44100, 16, 1, true, true);
->>>>>>> 3de91ab4432359feac8761045dfd8091ccfb4d6b
+        this.audioFormat = new AudioFormat(44100, 16, 1, true, true) ;
         initializeDatabase();
         initializeUI();
         loadUserInfo();
