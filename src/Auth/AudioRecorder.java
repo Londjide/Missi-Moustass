@@ -255,12 +255,6 @@ public class AudioRecorder extends JFrame {
                 }
             }
         });
-<<<<<<< HEAD:src/main/AudioRecorder.java
-        
-        //button arret
-        
-=======
->>>>>>> 5bb9ba2625932c3d82618157d485a11240ef5fb7:src/Auth/AudioRecorder.java
         btnStop = new JButton("Arrêter");
         btnStop.setEnabled(false);
         btnStop.addActionListener(new ActionListener() {

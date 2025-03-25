@@ -1,7 +1,7 @@
 # Fichiers compilés
 
-/bin/
-*.class
+# /bin
+# *.class
 
 # Fichiers Eclipse
 .settings/
