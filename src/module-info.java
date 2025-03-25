@@ -6,8 +6,9 @@ module Missié_Moustass_V1 {
     requires java.sql;
     requires java.desktop;
     requires java.security.jgss;
+	requires junit;
     
     exports com.barbichetz.voice;
-    exports com.barbichetz.security;
-    exports com.barbichetz.storage;
+    exports com.barbichetz.security;//
+    // exports com.barbichetz.storage;
 }
