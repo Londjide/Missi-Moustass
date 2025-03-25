@@ -1,0 +1,36 @@
+/**
+ * Application d'enregistrement et de lecture de messages vocaux sécurisés.
+ * Ce projet implémente une solution pour l'entreprise Barbichetz permettant :
+ * - L'enregistrement de messages vocaux
+ * - Le chiffrement des données audio pour la confidentialité
+ * - La vérification d'intégrité des enregistrements
+ * - La gestion de plusieurs utilisateurs
+ *
+ * Architecture du projet :
+ * - Package audio : Gestion des enregistrements et lectures audio
+ * - Package security : Chiffrement et déchiffrement des données
+ * - Package storage : Persistance des données en base SQLite
+ * - Package ui : Interface utilisateur graphique
+ *
+ * Pour les développeurs :
+ * 1. Processus d'enregistrement :
+ *    - Création du format audio (AudioFormatManager)
+ *    - Capture du son via le microphone (AudioRecorder)
+ *    - Chiffrement des données (MessageEncryption)
+ *    - Stockage en base de données (AudioRepository)
+ *
+ * 2. Processus de lecture :
+ *    - Récupération des données depuis la base (AudioRepository)
+ *    - Déchiffrement des données (MessageEncryption)
+ *    - Vérification de l'intégrité (SHA)
+ *    - Lecture audio (AudioPlayer)
+ *
+ * 3. Principaux problèmes connus :
+ *    - NullPointerException : Peut survenir si le format audio n'est pas correctement initialisé
+ *      → Solution : Utiliser AudioFormatManager.getDefaultFormat() en cas de format null
+ *    - Lecture accélérée : Problème de taux d'échantillonnage lors de la lecture
+ *      → Solution : Conversion du format via adjustPlaybackSpeed dans AudioPlayer
+ *
+ * @version 1.0
+ * @author Équipe MedSyncDev
+ */

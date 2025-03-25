@@ -9,7 +9,7 @@
 .project
 
 # Base de données et enregistrements
-*.db
+# *.db
 recordings/
 
 # Logs
