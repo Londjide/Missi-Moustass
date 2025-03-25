@@ -8,7 +8,7 @@ module Missié_Moustass_V1 {
     requires java.security.jgss;
 	requires junit;
     
-    exports com.barbichetz.voice;
-    exports com.barbichetz.security;//
+    //exports com.barbichetz.voice;
+    //exports com.barbichetz.security;
     // exports com.barbichetz.storage;
 }

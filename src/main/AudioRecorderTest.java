@@ -1,6 +1,9 @@
 package main;
 
 import org.junit.Test;
+
+import Auth.AudioRecorder;
+
 import static org.junit.Assert.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
