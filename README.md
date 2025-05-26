@@ -1,85 +1,239 @@
-# Projet Missié Moustass
+# Missié Moustass 2 - Application d'Enregistrement Audio
 
-## Description
-Application de gestion sécurisée de messages vocaux développée pour l'entreprise Barbichetz dans le contexte de la protection des communications confidentielles à l'île Maurice.
+## 📝 Description
 
-## Fonctionnalités
-- Enregistrement de messages vocaux
-- Lecture des messages
-- Chiffrement des données avec AES
-- Vérification d'intégrité avec SHA
-- Interface utilisateur intuitive
-- Stockage en base de données SQLite
+Missié Moustass 2 est une application Java d'enregistrement audio avec interface graphique Swing. Elle permet aux utilisateurs d'enregistrer, de lire, de gérer et de partager des enregistrements audio de manière sécurisée avec chiffrement AES.
 
-## Structure du projet
+## ✨ Fonctionnalités
 
-### Packages
-- `com.barbichetz.audio` : Gestion des enregistrements et lectures audio
-- `com.barbichetz.security` : Chiffrement et déchiffrement des données
-- `com.barbichetz.storage` : Persistance des données en base SQLite
-- `main` : Classes principales de l'application
+### 🎤 Enregistrement Audio
 
-### Classes principales
-- `AudioRecorder` : Interface utilisateur et point d'entrée de l'application
-- `AudioFormatManager` : Gestion des formats audio
-- `AudioPlayer` : Lecture des fichiers audio
-- `AES` : Chiffrement et déchiffrement des données
-- `SHA` : Vérification d'intégrité des messages
+- Enregistrement audio en temps réel
+- Sauvegarde automatique avec chiffrement AES
+- Gestion des métadonnées (nom, date, durée)
+- Support de différents formats audio
 
-## Guide pour les développeurs
+### 🔐 Sécurité
 
-### Processus d'enregistrement
-1. L'utilisateur se connecte à l'application
-2. L'utilisateur démarre l'enregistrement (bouton "Record")
-3. L'audio est capturé via le microphone
-4. L'utilisateur arrête l'enregistrement (bouton "Stop")
-5. Les données audio sont chiffrées avec AES
-6. L'enregistrement est stocké en base de données
+- Chiffrement AES des enregistrements
+- Système d'authentification utilisateur
+- Gestion des clés de chiffrement personnalisées
+- Protection des données sensibles
 
-### Processus de lecture
-1. L'utilisateur sélectionne un enregistrement dans la liste
-2. Les données sont récupérées depuis la base
-3. Les données sont déchiffrées
-4. L'intégrité est vérifiée avec SHA
-5. Le message audio est lu via le système audio
+### 👥 Gestion des Utilisateurs
 
-### Problèmes connus et solutions
-1. **NullPointerException lors de la lecture**
-   - Problème : Le format audio peut être null
-   - Solution : Utilisation de `AudioFormatManager.getDefaultFormat()`
-   
-2. **Lecture accélérée des enregistrements**
-   - Problème : Taux d'échantillonnage incorrect lors de la lecture
-   - Solution : Utilisation de `adjustPlaybackSpeed()` dans `AudioPlayer`
+- Système de connexion/inscription
+- Interface administrateur
+- Gestion des permissions utilisateur
+- Historique des connexions récentes
 
-## Principes SOLID appliqués
-1. **Single Responsibility Principle**
-   - Chaque classe a une responsabilité unique
-   - Exemple : `AudioFormatManager` gère uniquement les formats audio
-   
-2. **Open/Closed Principle**
-   - Classes ouvertes à l'extension, fermées à la modification
-   - Exemple : Nouvelle fonctionnalité d'ajustement de vitesse sans modifier le code existant
-   
-3. **Liskov Substitution Principle**
-   - Les sous-classes peuvent remplacer leurs classes parentes
-   
-4. **Interface Segregation Principle**
-   - Interfaces spécifiques plutôt que génériques
-   
-5. **Dependency Inversion Principle**
-   - Dépendances vers des abstractions plutôt que des implémentations
+### 📤 Partage d'Enregistrements
 
-## Comment lancer l'application
-1. Assurez-vous d'avoir Java 17+ installé
-2. Exécutez la classe `main.AudioRecorder`
-3. Utilisez l'identifiant utilisateur par défaut (1)
+- Partage sécurisé entre utilisateurs
+- Gestion des permissions de partage
+- Historique des partages
+- Notifications de partage
 
-## Comment contribuer
-1. Créez une branche pour votre fonctionnalité
-2. Assurez-vous de respecter les principes SOLID
-3. Documentez clairement votre code
-4. Soumettez une pull request
+### 🎵 Lecture Audio
 
-## Contacts
-Pour toute question, contacter l'équipe de développement MedSyncDev. 
+- Lecteur audio intégré
+- Contrôles de lecture (play/pause/stop)
+- Ouverture avec clé personnalisée
+- Gestion des erreurs de déchiffrement
+
+## 🏗️ Architecture
+
+### Structure du Projet
+
+```
+src/
+├── controller/          # Contrôleurs MVC
+├── model/              # Modèles de données
+├── service/            # Services métier
+│   ├── impl/          # Implémentations des services
+│   └── ...            # Services principaux
+├── view/              # Interfaces utilisateur (Swing)
+├── util/              # Utilitaires et helpers
+├── main/              # Classes principales
+└── test/              # Tests unitaires
+```
+
+### Services Principaux
+
+- **AudioRecordingService** : Gestion des enregistrements audio
+- **UserService** : Gestion des utilisateurs
+- **CryptographyService** : Chiffrement/déchiffrement
+- **SharedRecordingService** : Partage d'enregistrements
+- **DatabaseService** : Accès aux données SQLite
+- **NotificationService** : Système de notifications
+
+### Technologies Utilisées
+
+- **Java Swing** : Interface graphique
+- **SQLite** : Base de données locale
+- **AES** : Chiffrement des données
+- **RSA** : Chiffrement asymétrique
+- **Maven/Gradle** : Gestion des dépendances
+
+## 🚀 Installation et Démarrage
+
+### Prérequis
+
+- Java 8 ou supérieur
+- Système audio fonctionnel
+- Permissions d'écriture dans le répertoire de l'application
+
+### Compilation
+
+```bash
+# Compilation des sources
+javac -cp "lib/*" src/**/*.java -d bin/
+
+# Ou utilisation d'un IDE comme Eclipse/IntelliJ
+```
+
+### Exécution
+
+```bash
+# Démarrage normal
+java -cp "bin:lib/*" Application
+
+# Démarrage en mode debug
+java -cp "bin:lib/*" Application --debug
+
+# Démarrage avec correctifs
+java -cp "bin:lib/*" Application --fix
+```
+
+## 🔧 Configuration
+
+### Base de Données
+
+- La base de données SQLite (`database.db`) est créée automatiquement
+- Schéma initialisé au premier démarrage
+- Sauvegarde automatique des données
+
+### Enregistrements
+
+- Stockés dans le dossier `recordings/`
+- Chiffrés avec AES-256
+- Métadonnées sauvegardées en base
+
+### Logs
+
+- Fichiers de logs dans le dossier `logs/`
+- Niveaux : DEBUG, INFO, WARNING, ERROR, FATAL
+- Rotation automatique des logs
+
+## 🐛 Corrections Récentes
+
+### Problèmes Résolus
+
+1. **Boutons d'action désactivés** : Correction des conditions d'activation après sélection
+2. **Erreur "no such column: encryption_key"** : Gestion d'exception avec fallback
+3. **Contrainte NOT NULL sur shared_date** : Ajout de la date de partage automatique
+4. **Problème de lecture des anciens enregistrements** : Amélioration de la gestion des clés
+
+### Améliorations de Sécurité
+
+- Validation des clés de chiffrement
+- Protection contre les accès non autorisés
+- Gestion des erreurs de déchiffrement
+
+## 📊 Structure de la Base de Données
+
+### Tables Principales
+
+- **users** : Informations utilisateur
+- **recordings** : Métadonnées des enregistrements
+- **shared_recordings** : Partages entre utilisateurs
+- **user_keys** : Clés de chiffrement utilisateur
+
+## 🧪 Tests
+
+### Tests Unitaires
+
+```bash
+# Exécution des tests
+java -cp "bin:lib/*:test/" org.junit.runner.JUnitCore TestSuite
+```
+
+### Tests Audio
+
+- Fichiers de test dans `test_audio/`
+- Tests d'enregistrement et de lecture
+- Validation du chiffrement/déchiffrement
+
+## 📈 Monitoring et Logs
+
+### Système de Logs
+
+- **LogManager** : Gestionnaire centralisé des logs
+- Niveaux configurables
+- Sortie console et fichier
+
+### Diagnostic
+
+- Interface de diagnostic intégrée
+- Vérification de l'intégrité des services
+- Tests de connectivité base de données
+
+## 🤝 Contribution
+
+### Standards de Code
+
+- Respect des principes SOLID
+- Documentation JavaDoc
+- Tests unitaires obligatoires
+- Gestion d'erreurs robuste
+
+### Workflow Git
+
+```bash
+# Cloner le repository
+git clone [URL_DU_REPO]
+
+# Créer une branche feature
+git checkout -b feature/nouvelle-fonctionnalite
+
+# Commit et push
+git add .
+git commit -m "Description des modifications"
+git push origin feature/nouvelle-fonctionnalite
+```
+
+## 📄 Licence
+
+Ce projet est sous licence [À DÉFINIR]. Voir le fichier LICENSE pour plus de détails.
+
+## 👨‍💻 Auteurs
+
+- **Équipe de développement** - Développement initial et maintenance
+
+## 🆘 Support
+
+Pour toute question ou problème :
+
+1. Vérifier les logs dans le dossier `logs/`
+2. Consulter la documentation technique
+3. Créer une issue sur le repository Git
+
+## 🔄 Versions
+
+### Version Actuelle : 2.0
+
+- Interface utilisateur améliorée
+- Système de chiffrement renforcé
+- Partage d'enregistrements
+- Corrections de bugs critiques
+
+### Roadmap
+
+- [ ] Support de nouveaux formats audio
+- [ ] Interface web
+- [ ] Synchronisation cloud
+- [ ] API REST
+
+---
+
+**Note** : Ce projet est en développement actif. Les fonctionnalités peuvent évoluer rapidement.
